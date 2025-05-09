@@ -16,7 +16,6 @@
 
 <script>
     const backend_url = "https://poketwitch.bframework.de/";
-    const image_url = "https://dev.bframework.de/";
 
     const spriteElements = [
         document.getElementById("sprite0"),
@@ -29,12 +28,16 @@
     let last_pokedex_id = 0;
     let recentSpawns = [];
 
+    function padId(id) {
+        return id.toString().padStart(4, '0');
+    }
+
     function updateSprites() {
         for (let i = 0; i < spriteElements.length; i++) {
             const sprite = spriteElements[i];
             if (i < recentSpawns.length) {
-                const { order } = recentSpawns[i];
-                sprite.src = `${image_url}static/pokedex/png-high-res-sprites/pokemon/${order}.png`;
+                const { pokedex_id } = recentSpawns[i];
+                sprite.src = `https://projectpokemon.org/images/sprites-models/sv-sprites-home/${padId(pokedex_id)}.png`;
                 sprite.style.display = "block";
             } else {
                 sprite.style.display = "none";
@@ -46,7 +49,7 @@
         fetch(backend_url + 'info/events/last_spawn/')
             .then(res => res.json())
             .then(data => {
-                const { next_spawn, pokedex_id, order } = data;
+                const { next_spawn, pokedex_id } = data;
 
                 if (next_spawn > 30 + (60 * 13)) {
                     if (last_pokedex_id === pokedex_id) {
@@ -57,7 +60,7 @@
                     last_pokedex_id = pokedex_id;
 
                     // Add to list and trim
-                    recentSpawns.unshift({ pokedex_id, order });
+                    recentSpawns.unshift({ pokedex_id });
                     if (recentSpawns.length > 5) recentSpawns.pop();
 
                     updateSprites();
@@ -77,4 +80,3 @@
 
 </body>
 </html>
-
