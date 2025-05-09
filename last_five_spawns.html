@@ -17,8 +17,6 @@
 <script>
     const backend_url = "https://poketwitch.bframework.de/";
     const image_url = "https://dev.bframework.de/";
-    const urlParams = new URLSearchParams(window.location.search);
-    const gif = urlParams.get('gif') !== "false";
 
     const spriteElements = [
         document.getElementById("sprite0"),
@@ -35,10 +33,8 @@
         for (let i = 0; i < spriteElements.length; i++) {
             const sprite = spriteElements[i];
             if (i < recentSpawns.length) {
-                const { pokedex_id, order } = recentSpawns[i];
-                sprite.src = gif
-                    ? `${image_url}static/pokedex/sprites/front/${pokedex_id}.gif`
-                    : `${image_url}static/pokedex/png-high-res-sprites/pokemon/${order}.png`;
+                const { order } = recentSpawns[i];
+                sprite.src = `${image_url}static/pokedex/png-high-res-sprites/pokemon/${order}.png`;
                 sprite.style.display = "block";
             } else {
                 sprite.style.display = "none";
@@ -60,7 +56,7 @@
 
                     last_pokedex_id = pokedex_id;
 
-                    // Add new spawn to front of array
+                    // Add to list and trim
                     recentSpawns.unshift({ pokedex_id, order });
                     if (recentSpawns.length > 5) recentSpawns.pop();
 
@@ -81,3 +77,4 @@
 
 </body>
 </html>
+
