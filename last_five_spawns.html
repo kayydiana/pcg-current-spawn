@@ -37,7 +37,7 @@
             if (i < recentSpawns.length) {
                 const { pokedex_id, order } = recentSpawns[i];
                 sprite.src = gif
-                    ? `${image_url}static/pokedex/sprites/front-shiny/${pokedex_id}.gif`
+                    ? `${image_url}static/pokedex/sprites/front/${pokedex_id}.gif`
                     : `${image_url}static/pokedex/png-high-res-sprites/pokemon/${order}.png`;
                 sprite.style.display = "block";
             } else {
