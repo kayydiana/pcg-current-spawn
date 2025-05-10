@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Last 5 Spawns</title>
+    <style>
+        @font-face {
+            font-family: 'PokemonSolidNormal-xyWR';
+            src: url('https://kayydiana.github.io/pcg-current-spawn/fonts/PokemonSolidNormal-xyWR.ttf?raw=true') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column; /* keeps the title above the sprites */
+        }
+        h2 {
+            margin: 0; /* Removes any margin from the top and bottom */
+            padding: 0; /* Removes any padding */
+            text-align: center;
+            font-family: 'PokemonSolidNormal-xyWR', sans-serif;
+            color: #f4f4f4;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
+            margin-bottom: 0px;
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body>
+<div id="sprite-container" style="display:flex;gap:3px;">
+    <img id="sprite0" style="width:100px;height:100px;display:none;">
+    <img id="sprite1" style="width:100px;height:100px;display:none;">
+    <img id="sprite2" style="width:100px;height:100px;display:none;">
+    <img id="sprite3" style="width:100px;height:100px;display:none;">
+    <img id="sprite4" style="width:100px;height:100px;display:none;">
+</div>
+<h2>Most Recent Spawns</h2>
+
+<script>
+    const backend_url = "https://poketwitch.bframework.de/";
+    const image_url = "https://dev.bframework.de/";
+    const urlParams = new URLSearchParams(window.location.search);
+    const gif = urlParams.get('gif') !== "false";
+
+    const spriteElements = [
+        document.getElementById("sprite0"),
+        document.getElementById("sprite1"),
+        document.getElementById("sprite2"),
+        document.getElementById("sprite3"),
+        document.getElementById("sprite4")
+    ];
+
+    let last_pokedex_id = 0;
+    let recentSpawns = [];
+
+    function updateSprites() {
+        for (let i = 0; i < spriteElements.length; i++) {
+            const sprite = spriteElements[i];
+            if (i < recentSpawns.length) {
+                const { pokedex_id, order } = recentSpawns[i];
+                sprite.src = gif
+                    ? `${image_url}static/pokedex/png-sprites/pokemon/${pokedex_id}.png`
+                    : `${image_url}static/pokedex/png-high-res-sprites/pokemon/${order}.png`;
+                sprite.style.display = "block";
+            } else {
+                sprite.style.display = "none";
+            }
+        }
+    }
+
+    function update_image() {
+        fetch(backend_url + 'info/events/last_spawn/')
+            .then(res => res.json())
+            .then(data => {
+                const { next_spawn, pokedex_id, order } = data;
+
+                if (next_spawn > 30 + (60 * 13)) {
+                    if (last_pokedex_id === pokedex_id) {
+                        setTimeout(update_image, 3000);
+                        return;
+                    }
+
+                    last_pokedex_id = pokedex_id;
+
+                    // Add new spawn to front of array
+                    recentSpawns.unshift({ pokedex_id, order });
+                    if (recentSpawns.length > 5) recentSpawns.pop();
+
+                    updateSprites();
+
+                    setTimeout(update_image, next_spawn * 1000);
+                } else {
+                    setTimeout(update_image, next_spawn * 1000);
+                }
+            })
+            .catch(() => {
+                setTimeout(update_image, 10000);
+            });
+    }
+
+    const TEST_MODE = false;
+
+    if (TEST_MODE) {
+        // Dummy Pokémon data for testing layout
+        recentSpawns = [
+            { pokedex_id: 25, order: 25 },
+            { pokedex_id: 1, order: 1 },
+            { pokedex_id: 4, order: 4 },
+            { pokedex_id: 7, order: 7 },
+            { pokedex_id: 39, order: 39 }
+        ];
+        updateSprites();
+    } else {
+        update_image();
+    }
+</script>
+
+</body>
+</html>
