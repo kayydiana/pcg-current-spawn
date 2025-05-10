@@ -27,11 +27,8 @@
             margin-bottom: 0px;
             font-weight: normal;
         }
-        .glow {
-            filter: drop-shadow(0 0 4px #00f) drop-shadow(0 0 8px #00f);
-        }
         .dim-0.glow {
-            filter: brightness(1) drop-shadow(0 0 4px #00f) drop-shadow(0 0 8px #00f);
+            filter: brightness(1) drop-shadow(0 0 4px rgb(255, 0, 230)) drop-shadow(0 0 8px rgb(255, 0, 230));
         }
         .dim-1 { filter: brightness(0.9); }
         .dim-2 { filter: brightness(0.8); }
@@ -67,21 +64,31 @@
     let last_pokedex_id = 0;
     let recentSpawns = [];
 
+    // Function to extract the 'format' parameter from the URL
+    function getURLParams() {
+        const params = new URLSearchParams(window.location.search);
+        return {
+            format: params.has('format') ? params.get('format') === 'true' : false // Default to false if not provided
+        };
+    }
+
     function updateSprites() {
+        const { format } = getURLParams(); // Get the 'format' parameter from the URL
+
         for (let i = 0; i < spriteElements.length; i++) {
             const sprite = spriteElements[i];
             sprite.className = "sprite"; // Reset all classes
 
             if (i < recentSpawns.length) {
                 const { pokedex_id, order } = recentSpawns[i];
-                sprite.src = gif
-                    ? `${image_url}static/pokedex/png-sprites/pokemon/${pokedex_id}.png`
-                    : `${image_url}static/pokedex/png-high-res-sprites/pokemon/${order}.png`;
+                sprite.src = `${image_url}static/pokedex/png-sprites/pokemon/${pokedex_id}.png`;
                 sprite.style.display = "block";
 
-                sprite.classList.add(`dim-${i}`);
-                if (i === 0) {
-                    sprite.classList.add("glow");
+                if (format) {
+                    sprite.classList.add(`dim-${i}`);
+                    if (i === 0) {
+                        sprite.classList.add("glow");
+                    }
                 }
             } else {
                 sprite.style.display = "none";
