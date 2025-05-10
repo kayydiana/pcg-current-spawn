@@ -27,6 +27,17 @@
             margin-bottom: 0px;
             font-weight: normal;
         }
+        .glow {
+            filter: drop-shadow(0 0 4px #00f) drop-shadow(0 0 8px #00f);
+        }
+        .dim-0.glow {
+            filter: brightness(1) drop-shadow(0 0 4px #00f) drop-shadow(0 0 8px #00f);
+        }
+        .dim-1 { filter: brightness(0.9); }
+        .dim-2 { filter: brightness(0.8); }
+        .dim-3 { filter: brightness(0.7); }
+        .dim-4 { filter: brightness(0.6); }
+
     </style>
 </head>
 <body>
@@ -59,17 +70,25 @@
     function updateSprites() {
         for (let i = 0; i < spriteElements.length; i++) {
             const sprite = spriteElements[i];
+            sprite.className = "sprite"; // Reset all classes
+
             if (i < recentSpawns.length) {
                 const { pokedex_id, order } = recentSpawns[i];
                 sprite.src = gif
                     ? `${image_url}static/pokedex/png-sprites/pokemon/${pokedex_id}.png`
                     : `${image_url}static/pokedex/png-high-res-sprites/pokemon/${order}.png`;
                 sprite.style.display = "block";
+
+                sprite.classList.add(`dim-${i}`);
+                if (i === 0) {
+                    sprite.classList.add("glow");
+                }
             } else {
                 sprite.style.display = "none";
             }
         }
     }
+
 
     function update_image() {
         fetch(backend_url + 'info/events/last_spawn/')
